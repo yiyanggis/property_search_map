@@ -1,0 +1,10 @@
+# exclude node module folder
+node_modules/
+
+# exclude bower folder
+bower_components/
+
+# debug files
+
+# log files
+*.log
