@@ -13,7 +13,9 @@ const dbInst=new db.DBModule();
 app.use(bodyParser.urlencoded({ extended: false }))
 
 // parse application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json());
+
+app.use(express.static('test/public'));
 
 app.get('/', function (req, res) {
   	res.send('Hello World!');
@@ -23,10 +25,16 @@ app.get('/test', function (req, res) {
 	res.sendfile('test/test.html');
 });
 
+app.get('/map', function (req, res) {
+	res.sendfile('test/public/property_search.html');
+});
+
 app.get('/table', function (req, res) {
 	dbInst.connecDB();
 	res.send('db connected');
 });
+
+
 
 // Route path: /tablename/:rowid
 // Request URL: http://localhost:3000/arrests/34
@@ -39,26 +47,23 @@ app.get('/data/:tablename/:rowid', function (req, res) {
 	geoTable.setQueryID(rowid);
 	dbInst.setTableName(table);
 	dbInst['query'+table].apply(null,[geoTable, res]);
-	//dbInst.queryTable()
-
-	//console.log("data: "+table+","+rowid);
-	//res.send("data: "+table+","+rowid);
-	//var testdb=new db.DBModule();
-	//testdb.getArrest(1);
-  	//res.send(result);
 });
 
-app.get('/testQuery', function (req, res) {
-	var testdb=new db.DBModule();
-	testdb.getArrest(1);
-  	res.send('GetArrest');
+app.get('/citylist', function (req, res) {
+	dbInst.queryCityList(res);
 });
 
-app.get('/testTable', function (req, res) {
-	var temp=new GeoTable.GeoTable("testName");
-	temp.getData(1);
-  	res.send('Get Table');
+app.get('/:cityName', function (req, res) {
+	var cityName=req.params.cityName;
+	dbInst.queryCityHistory(cityName,res);
 });
+
+app.get('/data/:tableName', function (req, res) {
+	var tableName=req.params.tableName;
+	dbInst.queryCityTable(tableName,res);
+});
+
+
 
 //app post request session for spatial queries
 app.post('/data/:tablename/geo', function (req, res) {

@@ -88,10 +88,6 @@
         return connectionStr;
       }
 
-      self.getArrest=function(id){
-        var queryStr="select * from bpd_arrests where gid="+id;
-        this.processQuery(queryStr);
-      }
 
       self.queryTable=function(name, id){
         var tableName=DBConfig[name].tableName;
@@ -106,6 +102,78 @@
         }
 
         
+      }
+
+      self.queryCityList=function(res){
+        var client = new pg.Client(self.createConnStr());
+
+        // connect to database
+        client.connect(function (err) {
+          if (err) throw err;
+
+          // execute a query on database
+          client.query('select distinct city from property_list', function (err, result) {
+            if (err) throw err;
+
+            // just print the result to the console
+            res.send(result.rows);
+
+            // disconnect the client
+            client.end(function (err) {
+              if (err) throw err;
+            });
+          });
+        });
+      }
+
+      self.queryCityHistory=function(cityName,res){
+        var client = new pg.Client(self.createConnStr());
+
+        // connect to database
+        client.connect(function (err) {
+          if (err) throw err;
+
+          var queryStr="select * from property_list where city='"+cityName+"';";
+
+          //console.log(queryStr);
+
+          // execute a query on database
+          client.query(queryStr, function (err, result) {
+            if (err) throw err;
+
+            // just print the result to the console
+            res.send(result.rows);
+
+            // disconnect the client
+            client.end(function (err) {
+              if (err) throw err;
+            });
+          });
+        });
+      }
+
+      self.queryCityTable=function(tablename,res){
+        var client = new pg.Client(self.createConnStr());
+
+        // connect to database
+        client.connect(function (err) {
+          if (err) throw err;
+
+          var queryStr="select * from "+tablename+";";
+
+          // execute a query on database
+          client.query(queryStr, function (err, result) {
+            if (err) throw err;
+
+            // just print the result to the console
+            res.send(result.rows);
+
+            // disconnect the client
+            client.end(function (err) {
+              if (err) throw err;
+            });
+          });
+        });
       }
 
       self.queryTableGeo=function(name, lat, lng, radius){
